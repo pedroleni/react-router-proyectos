@@ -9,13 +9,15 @@
 const SECRETO_DE_DESARROLLO = 'solo-para-desarrollo-no-lo-uses-en-produccion'
 
 export function secretosDeSesion(entorno: NodeJS.ProcessEnv = process.env): string[] {
-  // TODO (paso 10): lee entorno.SECRETO_SESION, sepáralo por comas, quita los
-  // espacios y descarta los vacíos. Si queda alguno, devuélvelos. Si no:
-  // - en producción (entorno.NODE_ENV === 'production'), lanza un Error con el
-  //   mensaje 'Falta la variable de entorno SECRETO_SESION: sin ella no se
-  //   pueden firmar las cookies de sesión.' (mejor no arrancar que firmar con
-  //   un secreto que está en el repositorio);
-  // - en desarrollo, devuelve [SECRETO_DE_DESARROLLO].
-  void entorno
+  const secretos = (entorno.SECRETO_SESION ?? '')
+    .split(',')
+    .map((secreto) => secreto.trim())
+    .filter(Boolean)
+  if (secretos.length > 0) return secretos
+
+  if (entorno.NODE_ENV === 'production') {
+    // Mejor no arrancar que firmar con un secreto que está en el repositorio.
+    throw new Error('Falta la variable de entorno SECRETO_SESION: sin ella no se pueden firmar las cookies de sesión.')
+  }
   return [SECRETO_DE_DESARROLLO]
 }

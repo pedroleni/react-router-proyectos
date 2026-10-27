@@ -2,14 +2,12 @@ import { Form, href, Link, NavLink, Outlet } from 'react-router'
 import ResumenCesta from '~/componentes/ResumenCesta'
 import { sesionContext, socioContext } from '~/contexto.server'
 import { productosDeLaSemana } from '~/datos/catalogo.server'
+import { exigirSocio } from '~/middleware/socio.server'
 import type { Route } from './+types/zona'
 
 // Todas las rutas de /socio pasan por aquí: el middleware las protege a todas,
 // también a las que no tienen loader y a la ruta de recursos del CSV.
-// TODO (paso 2): pon aquí exigirSocio, de ~/middleware/socio.server. Hasta
-// entonces, nadie deja al socio en el context y el loader de abajo falla con
-// «No value found for context».
-export const middleware: Route.MiddlewareFunction[] = []
+export const middleware: Route.MiddlewareFunction[] = [exigirSocio]
 
 // El loader hace además que el middleware se ejecute en cada navegación por la
 // zona: sin una petición al servidor, no habría nada que envolver.

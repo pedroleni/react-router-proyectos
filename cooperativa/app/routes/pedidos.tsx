@@ -1,15 +1,16 @@
-import { Link } from 'react-router'
-import { socioContext } from '~/contexto.server'
+import { href, Link } from 'react-router'
+import { sesionContext, socioContext } from '~/contexto.server'
 import { pedidosDeSocio } from '~/datos/pedidos.server'
 import { formatearEuros } from '~/dinero'
 import type { Route } from './+types/pedidos'
 
 export async function loader({ context }: Route.LoaderArgs) {
   const socio = context.get(socioContext)
+  const sesion = context.get(sesionContext)
   return {
-    // TODO (paso 4): el aviso que dejó la action del pedido, leído de la sesión
-    // del context (sesionContext) con get('aviso'), o null. Leerlo lo borra.
-    aviso: null as string | null,
+    // Leer un valor flash lo borra de la sesión. El middleware ve que la sesión
+    // ha cambiado y manda la cookie nueva: si recargas, el aviso ya no sale.
+    aviso: sesion.get('aviso') ?? null,
     pedidos: await pedidosDeSocio(socio.id),
   }
 }
@@ -32,9 +33,7 @@ export default function Pedidos({ loaderData }: Route.ComponentProps) {
         <ul className="lista-pedidos">
           {pedidos.map((pedido) => (
             <li key={pedido.id}>
-              {/* TODO (paso 8): escribe esta dirección con href(). Al hacerlo,
-                  TypeScript te dirá qué tiene de malo. */}
-              <Link to={`/socio/pedido/${pedido.id}`}>Pedido {pedido.id}</Link>
+              <Link to={href('/socio/pedidos/:id', { id: pedido.id })}>Pedido {pedido.id}</Link>
               <span>
                 {' '}
                 · semana {pedido.semana} · {fecha.format(new Date(pedido.creado))} · {formatearEuros(pedido.total)}

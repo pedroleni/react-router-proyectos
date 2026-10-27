@@ -1,4 +1,12 @@
-export function loader(): Response {
-  // TODO (lección 19): publica las etapas como JSON con CORS y caché pública.
-  throw new Error('TODO (lección 19): recurso etapas.json.')
+import { ETAPAS } from '~/datos/etapas'
+
+export function loader() {
+  return Response.json(ETAPAS, {
+    headers: {
+      // L19: son datos públicos sin cookies ni información personal, por eso `*` es seguro.
+      'Access-Control-Allow-Origin': '*',
+      'Cache-Control': 'public, max-age=3600',
+      'X-Content-Type-Options': 'nosniff',
+    },
+  })
 }

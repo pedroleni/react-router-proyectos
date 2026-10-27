@@ -12,9 +12,9 @@ export async function loader({ request }: Route.LoaderArgs) {
 }
 
 export function headers() {
-  // TODO (lección 17): añade una caché corta para navegador y proxy. Busca la
-  // exportación headers de un módulo de ruta y stale-while-revalidate.
-  return {}
+  // L17: max-age controla el navegador, s-maxage el proxy compartido y
+  // stale-while-revalidate permite servir el dato anterior mientras se renueva.
+  return { 'Cache-Control': 'public, max-age=60, s-maxage=300, stale-while-revalidate=600' }
 }
 
 export default function Camas({ loaderData }: Route.ComponentProps) {

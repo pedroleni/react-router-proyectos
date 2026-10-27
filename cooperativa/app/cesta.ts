@@ -19,14 +19,13 @@ export function leerCambio(valor: FormDataEntryValue | null): Cambio | null {
 
 /** La cesta después de un cambio, sin bajar de 0 ni pasar del máximo de cada producto. */
 export function aplicarCambio(cesta: Cesta, cambio: Cambio, productos: Producto[]): Cesta {
-  // TODO (paso 3): devuelve una cesta nueva (sin tocar la que recibes):
-  // - «vaciar» la deja vacía;
-  // - «sumar» y «restar» cambian en uno el producto, sin bajar de 0 ni pasar de
-  //   su maximo; un producto que no está en la lista deja la cesta igual;
-  // - un producto que se queda a 0 desaparece de la cesta.
-  void cambio
-  void productos
-  return cesta
+  if (cambio.tipo === 'vaciar') return {}
+  const producto = productos.find((p) => p.id === cambio.productoId)
+  if (!producto) return cesta
+  const actual = cesta[producto.id] ?? 0
+  const nueva = Math.min(producto.maximo, Math.max(0, actual + (cambio.tipo === 'sumar' ? 1 : -1)))
+  const { [producto.id]: _quitada, ...resto } = cesta
+  return nueva > 0 ? { ...resto, [producto.id]: nueva } : resto
 }
 
 /**
@@ -35,14 +34,18 @@ export function aplicarCambio(cesta: Cesta, cambio: Cambio, productos: Producto[
  * cuadra: más unidades que el máximo, un producto que no existe, un cambio raro...
  */
 export function cestaDelFormulario(formulario: FormData, productos: Producto[]): Cesta | null {
-  // TODO (paso 3): para cada producto, lee el campo cantidad-<id>. Si no está,
-  // sáltalo; si no es un entero entre 0 y su maximo, devuelve null; si es más
-  // de 0, va a la cesta. Después lee el campo «cambio» con leerCambio: si es
-  // null, o si suma o resta un producto que no existe, devuelve null. Si no,
-  // devuelve la cesta con el cambio aplicado (aplicarCambio).
-  void formulario
-  void productos
-  return null
+  const cesta: Cesta = {}
+  for (const producto of productos) {
+    const valor = formulario.get(`cantidad-${producto.id}`)
+    if (valor === null) continue
+    const cantidad = Number(valor)
+    if (!Number.isInteger(cantidad) || cantidad < 0 || cantidad > producto.maximo) return null
+    if (cantidad > 0) cesta[producto.id] = cantidad
+  }
+  const cambio = leerCambio(formulario.get('cambio'))
+  if (!cambio) return null
+  if (cambio.tipo !== 'vaciar' && !productos.some((p) => p.id === cambio.productoId)) return null
+  return aplicarCambio(cesta, cambio, productos)
 }
 
 /** Las líneas de la cesta, con el nombre y el precio de cada producto. */
@@ -67,9 +70,6 @@ export function unidadesDeCesta(cesta: Cesta): number {
  */
 export function useCestaOptimista(cesta: Cesta, productos: Producto[]) {
   const fetcher = useFetcher<typeof action>({ key: FETCHER_CESTA })
-  // TODO (paso 3): la respuesta optimista. Mientras haya fetcher.formData, la
-  // cesta que se pinta es la que pide ese envío: cestaDelFormulario(formData,
-  // productos). Si eso da null, o no hay envío, la que llega del servidor.
-  void productos
-  return { fetcher, cesta }
+  const enviada = fetcher.formData ? cestaDelFormulario(fetcher.formData, productos) : null
+  return { fetcher, cesta: enviada ?? cesta }
 }

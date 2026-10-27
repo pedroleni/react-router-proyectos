@@ -1,27 +1,25 @@
-import { data, href, isRouteErrorResponse, Link, useLoaderData, type LoaderFunctionArgs } from 'react-router'
+import { data, href, isRouteErrorResponse, Link } from 'react-router'
+import { socioContext } from '~/contexto.server'
 import { buscarPedido } from '~/datos/pedidos.server'
 import { formatearEuros } from '~/dinero'
 import { DIAS, PUNTOS } from '~/reparto'
-import type { Pedido } from '~/tipos'
 import type { Route } from './+types/pedido-detalle'
 
-// TODO (paso 8): este módulo está escrito como en el modo datos, con
-// LoaderFunctionArgs y useLoaderData() sin tipos. npm run typecheck se queja
-// de params.id. Pásalo a los tipos generados: Route.LoaderArgs en el loader y
-// { loaderData }: Route.ComponentProps en el componente.
-export async function loader({ params }: LoaderFunctionArgs) {
+// Route.LoaderArgs sale de routes.ts: como la ruta es pedidos/:id, params.id
+// es un string, no un string | undefined.
+export async function loader({ params, context }: Route.LoaderArgs) {
+  const socio = context.get(socioContext)
   const pedido = await buscarPedido(params.id)
-  // TODO (paso 8): el id llega en la URL y cualquiera puede cambiarlo. Lee el
-  // socio del context (socioContext) y, si el pedido es de otro, responde lo
-  // mismo que si no existiera.
-  if (!pedido) {
+  // El id llega en la URL y cualquiera puede cambiarlo. Un pedido de otro
+  // socio responde lo mismo que uno que no existe: un 404, sin decir de quién es.
+  if (!pedido || pedido.socioId !== socio.id) {
     throw data('No encontramos ese pedido entre los tuyos.', { status: 404 })
   }
   return { pedido }
 }
 
-export default function PedidoDetalle() {
-  const { pedido } = useLoaderData() as { pedido: Pedido }
+export default function PedidoDetalle({ loaderData }: Route.ComponentProps) {
+  const { pedido } = loaderData
   return (
     <main className="pagina estrecha">
       <title>{`Pedido ${pedido.id} · La Huerta del Ebro`}</title>

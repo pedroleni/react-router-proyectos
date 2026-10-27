@@ -4,21 +4,9 @@
 
 Proyecto avanzado 24 de la ficha de React Router de [Tech Study Tracker](https://www.techstudytracker.com).
 
-**Esta es la rama `main`**: el punto de partida. Los estilos, los datos, los
-componentes y los tests ya están; en cada sitio que tienes que construir hay
-un comentario `TODO (paso N)`, con el mismo número que los pasos de la lección.
-La rama [`solucion`](../../tree/solucion/cooperativa) tiene el proyecto terminado.
-
-Al empezar, `npm test` da `41 failed | 11 passed | 3 todo`: los 11 que pasan
-comprueban la capa de datos, que ya está hecha, el secreto de desarrollo y la
-parte de `?volver=` que la versión ingenua ya cubre. Se ponen en verde paso a
-paso: 18 tras el paso 1, 22 tras el 2, 26 tras el 3, 33 tras el 4, 37 tras el 5,
-39 tras el 6, 49 tras el 7 y 50 tras el 8. En el 9 escribes tú los tres tests
-que faltan (53), y con el 10 pasan los 55. `npm run typecheck` marca un error, `params.id` en
-`pedido-detalle.tsx`, que desaparece en el paso 8.
-
-Hasta el paso 2, la zona de socios enseña «Algo ha fallado» con
-`No value found for context`: nadie ha dejado todavía al socio en el contexto.
+**Esta es la rama `solucion`**: la implementación completa. La rama
+[`main`](../../tree/main/cooperativa) tiene el punto de partida, con un
+`TODO (paso N)` en cada sitio que tienes que construir.
 
 La Cooperativa La Huerta del Ebro, de Zaragoza, reparte cada semana cestas de
 verdura, fruta, huevos y pan de las huertas de la vega del Ebro. Sus socios
@@ -43,19 +31,6 @@ usuarios, sesiones y seguridad:
 - **Tests** de `loader`, `action` y middleware llamados como funciones, y de
   componentes con `createRoutesStub`.
 - **Desplegarla** con `react-router-serve` y Docker.
-
-## Los pasos
-
-1. Iniciar sesión con una cookie de sesión firmada (`sesiones.server.ts`, `entrar.tsx`, `salir.tsx`).
-2. Un middleware que protege la zona y deja al socio en el contexto (`middleware/socio.server.ts`, `zona.tsx`).
-3. La cesta en la sesión, con un fetcher y respuesta optimista (`cesta.ts`, `routes/cesta.tsx`).
-4. El pedido validado con Zod, y el aviso *flash* (`validacion/pedido.ts`, `pedido.tsx`, `pedidos.tsx`).
-5. La hoja de reparto en CSV, una ruta de recursos (`csv.ts`, `reparto-csv.ts`).
-6. Prerenderizar las páginas fijas y `Cache-Control` en el catálogo (`react-router.config.ts`, `catalogo.tsx`).
-7. `?volver=` validado y `allowedActionOrigins` (`seguridad.ts`, `react-router.config.ts`).
-8. Los tipos generados y `href()` (`pedido-detalle.tsx`, `pedidos.tsx`).
-9. Tus tests con `createRoutesStub` (`pruebas/componentes.test.tsx`).
-10. Desplegar: el secreto desde el entorno y Docker (`config.server.ts`, `Dockerfile`).
 
 ## Qué hay dentro
 
@@ -106,7 +81,7 @@ npm run dev
 ```
 
 - `npm run dev`: servidor de desarrollo en `http://localhost:5173`
-- `npm test`: los tests (55 al terminar)
+- `npm test`: los tests (55)
 - `npm run typecheck`: genera los tipos de las rutas y comprueba los de todo el proyecto
 - `npm run build`: construye el servidor y el cliente en `build/`, con las páginas prerenderizadas
 - `SECRETO_SESION=… npm start`: arranca ese build, el servidor de producción, en `http://localhost:3000`

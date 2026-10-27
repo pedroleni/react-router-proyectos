@@ -6,8 +6,13 @@ startTransition(() => {
   hydrateRoot(
     document,
     <StrictMode>
-      {/* TODO (lección 22): añade onError para los fallos de navegación del navegador. */}
-      <HydratedRouter />
+      <HydratedRouter
+        // L22: onError observa fallos de navegación tras hidratar, que ya no pasan
+        // por el manejador de errores del documento servidor.
+        onError={(error, informacion) =>
+          console.error('Error en el navegador', { error, ruta: informacion.location.pathname })
+        }
+      />
     </StrictMode>,
   )
 })

@@ -9,15 +9,22 @@ import { href } from 'react-router'
  * ruta, ya normalizada, no empieza por //.
  */
 export function destinoSeguro(volver: FormDataEntryValue | null, request: Request): string {
-  // TODO (paso 7): esto no basta. //otra-web.example y /\otra-web.example
-  // empiezan por una barra, pero el navegador las lee como otro dominio.
-  // Interpreta volver como lo haría el navegador, new URL(volver, origen), con
-  // el origen de la petición (new URL(request.url).origin), y acéptalo solo si
-  // se queda en ese origen y su ruta, ya normalizada, no empieza por //:
-  // /.//otra-web.example es de tu origen, pero new URL lo deja en
-  // //otra-web.example. Devuelve pathname + search + hash. Si no, o si
-  // new URL lanza un error, href('/socio').
-  void request
-  if (typeof volver === 'string' && volver.startsWith('/')) return volver
-  return href('/socio')
+  const porDefecto = href('/socio')
+  if (typeof volver !== 'string' || volver === '') return porDefecto
+
+  const origen = new URL(request.url).origin
+  let destino: URL
+  try {
+    destino = new URL(volver, origen)
+  } catch {
+    return porDefecto
+  }
+  // //otra-web.example y /\otra-web.example empiezan por una barra, pero el
+  // navegador las lee como otro dominio: por eso no basta con startsWith('/').
+  if (destino.origin !== origen) return porDefecto
+  // Y el origen tampoco basta: new URL normaliza la ruta, y /.//otra-web.example,
+  // que es de nuestro origen, queda en //otra-web.example. En Location, el
+  // navegador también la lee como otro dominio.
+  const ruta = destino.pathname + destino.search + destino.hash
+  return ruta.startsWith('//') ? porDefecto : ruta
 }

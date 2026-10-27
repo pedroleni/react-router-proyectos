@@ -1,30 +1,34 @@
 import { useEffect, useRef } from 'react'
-import { data, Form, useNavigation } from 'react-router'
+import { data, Form, redirect, useNavigation } from 'react-router'
+import { comprobarCredenciales, buscarSocio } from '~/datos/socios.server'
 import { destinoSeguro } from '~/seguridad'
+import { guardarSesion, leerSesion } from '~/sesiones.server'
 import type { Route } from './+types/entrar'
 
 export async function loader({ request }: Route.LoaderArgs) {
   const volver = destinoSeguro(new URL(request.url).searchParams.get('volver'), request)
-  // TODO (paso 1): si la sesión (leerSesion) ya tiene un socio que existe
-  // (buscarSocio), no enseñes el formulario: lanza un redirect a volver.
+  // Si ya has entrado, no tiene sentido enseñarte el formulario.
+  const sesion = await leerSesion(request)
+  if (buscarSocio(sesion.get('socioId'))) throw redirect(volver)
   return { volver }
 }
 
 export async function action({ request }: Route.ActionArgs) {
   const formulario = await request.formData()
   const correo = String(formulario.get('correo') ?? '')
+  const clave = String(formulario.get('clave') ?? '')
   // El destino se vuelve a validar aquí: el campo oculto también se puede cambiar.
   const volver = destinoSeguro(formulario.get('volver'), request)
 
-  // TODO (paso 1): comprueba el correo y la contraseña (campo «clave») con
-  // comprobarCredenciales.
-  // - Si no valen, devuelve con data() un 400 con
-  //   { error: 'El correo o la contraseña no son correctos.', correo }:
-  //   un solo mensaje para los dos casos, sin decir si el correo existe.
-  // - Si valen, lee la sesión, guarda en ella el socioId y devuelve un
-  //   redirect a volver con la cabecera Set-Cookie de guardarSesion(sesion).
-  void volver
-  return data({ error: 'Todavía no se puede entrar: falta el paso 1.', correo }, { status: 501 })
+  const socio = await comprobarCredenciales(correo, clave)
+  if (!socio) {
+    // Un solo mensaje para los dos casos: no decimos si el correo existe.
+    return data({ error: 'El correo o la contraseña no son correctos.', correo }, { status: 400 })
+  }
+
+  const sesion = await leerSesion(request)
+  sesion.set('socioId', socio.id)
+  return redirect(volver, { headers: { 'Set-Cookie': await guardarSesion(sesion) } })
 }
 
 export default function Entrar({ loaderData, actionData }: Route.ComponentProps) {

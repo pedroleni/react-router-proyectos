@@ -1,8 +1,20 @@
+import { data, href, Link } from 'react-router'
+
 export function loader() {
-  // TODO (lección 14): devuelve un 404 HTTP real. Busca data y status.
-  throw new Error('TODO (lección 14): respuesta 404 para la ruta comodín.')
+  // L14: data(null, { status: 404 }) conserva la pantalla y da un 404 HTTP real.
+  return data(null, { status: 404 })
 }
 
 export default function NoEncontrada() {
-  return <main>Esta página no existe.</main>
+  return (
+    <main className="pagina estrecha">
+      <title>Página no encontrada | El Cea</title>
+      <meta name="robots" content="noindex" />
+      <h1>Esta página no existe</h1>
+      <p>Quizá el enlace esté incompleto o haya cambiado.</p>
+      <Link className="boton" to={href('/')}>
+        Volver al inicio
+      </Link>
+    </main>
+  )
 }

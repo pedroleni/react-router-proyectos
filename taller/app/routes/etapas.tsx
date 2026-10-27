@@ -1,4 +1,4 @@
-import { Link } from 'react-router'
+import { href, Link } from 'react-router'
 import { ETAPAS } from '~/datos/etapas'
 
 export default function Etapas() {
@@ -14,8 +14,7 @@ export default function Etapas() {
           <article key={etapa.slug}>
             <div>
               <h2>
-                {/* TODO (lección 15): usa href con el patrón y sus parámetros. */}
-                <Link to={`/etapas/${etapa.slug}`}>
+                <Link to={href('/etapas/:etapa', { etapa: etapa.slug })}>
                   {etapa.origen} <span>hasta</span> {etapa.destino}
                 </Link>
               </h2>

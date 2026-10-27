@@ -1,72 +1,8 @@
-> Este proyecto vive en la carpeta `taller/` de un repositorio con varios proyectos: clónalo entero y haz `cd taller` antes de los pasos siguientes.
-
 # Taller: Albergue de peregrinos El Cea
 
-Proyecto de prácticas de las lecciones 14 a 22 de React Router en [Tech Study Tracker](https://www.techstudytracker.com).
+App de prácticas del módulo 4 de la ficha de React Router de [Tech Study Tracker](https://www.techstudytracker.com). Esta carpeta contiene la solución completa de las lecciones 14 a 22.
 
-**Esta es la rama `main`**: el punto de partida. La app ya trae los estilos, los datos de Sahagún,
-las validaciones públicas y los tests, pero solo está registrada la portada. Lo que falta está marcado
-con `TODO (lección N)`. La rama [`solucion`](../../tree/solucion/taller) contiene la implementación
-completa, por si te atascas.
-
-## Las lecciones
-
-14. `app/routes.ts`, `app/root.tsx`, `app/routes/no-encontrada.tsx` y
-    `react-router.config.ts`: registra las rutas, completa el documento raíz y responde 404.
-    La zona de hospitaleros usa una `route()` padre con hijos porque necesita layout; `prefix()`
-    sería la alternativa si solo compartiera el segmento de URL.
-15. `app/routes/etapa.tsx`, `app/routes/etapas.tsx` y `app/contexto.server.ts`: usa los tipos
-    generados, `href`, contextos sin valor por defecto y una frontera de error segura.
-16. `app/datos/reservas.server.ts`, `app/mi-camino.ts`, `app/routes/etapa.tsx`,
-    `app/routes/mi-camino.tsx`, `app/medir.client.ts` y `app/root.tsx`: separa servidor y navegador,
-    serializa la persistencia, añade caché, `localStorage` y middleware cliente.
-17. `react-router.config.ts`, `app/routes/camas.tsx` y `app/entry.server.tsx`: configura el
-    prerender como array, las cabeceras de caché y el timeout del stream.
-18. `app/config.server.ts`, `app/sesiones.server.ts`, `app/contexto.server.ts`,
-    `app/middleware/hospitalero.server.ts`, `app/seguridad.ts` (`destinoProvisional`),
-    `app/routes/entrar.tsx`, `app/routes/salir.tsx` y `app/routes/hospitaleros/*`: crea la sesión,
-    protege toda la zona, valida el destino de vuelta y consume el flash.
-19. `app/csv.ts`, `app/config.server.ts`, `app/routes/recursos/*` y las rutas de hospitaleros:
-    implementa CSV, JSON, sitemap, webhook y subida de credenciales.
-20. `app/seguridad.ts`, `react-router.config.ts`, `app/entry.server.tsx`, `app/routes/entrar.tsx`,
-    `app/middleware/hospitalero.server.ts` y el detalle de reserva: endurece redirecciones, origen,
-    metadatos y CSP.
-21. `pruebas/21-mis-pruebas.test.tsx`: sustituye los cuatro `expect.fail` por pruebas de un
-    componente, un loader, una action y un middleware.
-22. `Dockerfile`, `.dockerignore`, `app/errores.server.ts`, `app/entry.server.tsx`,
-    `app/entry.client.tsx` y `app/config.server.ts`: prepara el contenedor, los errores y la
-    instrumentación. **TODO (lección 22):** crea `Dockerfile` y `.dockerignore`; no existen aún.
-
-## Pruebas y tipos al empezar
-
-`npm test` empieza con **5 tests en verde** (`00-base`) y **93 en rojo** (lecciones 14 a 22).
-Cada fallo señala el TODO de su lección. El reparto final es:
-
-| Lección | Tests |
-| ------- | ----: |
-| Base    |     5 |
-| 14      |     5 |
-| 15      |     5 |
-| 16      |     9 |
-| 17      |     3 |
-| 18      |    26 |
-| 19      |    19 |
-| 20      |    13 |
-| 21      |     4 |
-| 22      |     9 |
-
-Con TypeScript 7.0.2, `npm run typecheck` empieza con **20 errores**. Es deliberado: `routes.ts` solo
-registra la portada, por lo que React Router todavía no genera los `+types` de las demás rutas ni conoce
-sus patrones para `href`; además, `etapa.tsx` conserva el ejercicio de tipos de la lección 15. Estas son
-las cifras de la progresión completa:
-
-| Estado           | Inicio |  14 |  15 |  16 |  17 |  18 |  19 |  20 |  21 |  22 |
-| ---------------- | -----: | --: | --: | --: | --: | --: | --: | --: | --: | --: |
-| Errores de tipos |     20 |   1 |   0 |   0 |   0 |   0 |   0 |   0 |   0 |   0 |
-
-El `tsconfig` no contiene ninguna de las opciones eliminadas en TypeScript 7.
-
-`npm run leccion -- 18` ejecuta solamente `pruebas/18-*`.
+El Cea es un albergue ficticio de Sahagún, en el Camino Francés. La aplicación publica información del albergue y sus etapas, consulta camas y recibe reservas. La zona privada permite al turno de hospitaleros gestionar llegadas, credenciales y el CSV diario de pernoctas.
 
 ## Ejecutar el proyecto
 
@@ -77,11 +13,21 @@ npm ci
 npm run dev
 npm test
 npm run typecheck
+npm run build
+npm start
 ```
 
-La portada se sirve desde el principio. `npm run build` termina en los estados de inicio y de las
-lecciones 14 a 16. Desde la 17 también construye cliente y servidor, y después inicia el prerender; en
-entornos que no permiten abrir el servidor local de Vite se detendrá justo en ese punto.
+`npm run leccion -- 18` ejecuta solamente `pruebas/18-*`.
+
+`npm run build` genera además, una vez, «El albergue» y la página de cada etapa (el array
+`prerender` de `react-router.config.ts`). La portada no se genera al construir: enseña el aviso del
+Ayuntamiento, que puede llegar en cualquier momento. Después, `npm start` sirve el build de producción.
+
+En `inicio/` (la rama `main` del taller), `npm run typecheck` falla hasta terminar la lección 15. Es
+deliberado: faltan loaders, contextos y módulos de ruta de los que React Router genera los tipos
+`Route.*`; la lección completa esos contratos. En `solucion/`, el mismo comando debe quedar limpio.
+Con TypeScript 7.0.2, la progresión da 20 errores al inicio, 1 tras la 14 y 0 tras cada lección de la
+15 a la 22. El `tsconfig` no contiene ninguna de las opciones eliminadas en TypeScript 7.
 
 ## Cuentas de ejemplo
 
@@ -90,5 +36,62 @@ entornos que no permiten abrir el servidor local de Vite se detendrá justo en e
 
 Son identidades inventadas. También lo son las reservas y todos los datos de peregrinos.
 
-El Cea y todos sus datos son ficticios. Al terminar, `SECRETO_SESION`, `AVISOS_TOKEN` y
-`URL_PUBLICA` se configuran en el servidor; ninguna variable sensible debe empezar por `VITE_`.
+## Variables de entorno
+
+- `SECRETO_SESION`: obligatoria en producción y con 32 caracteres como mínimo por secreto. Firma la
+  cookie. Para rotarla, escribe `nuevo,viejo`; el primero firma y ambos validan.
+- `AVISOS_TOKEN`: obligatoria en producción y con 32 caracteres como mínimo. Autentica el webhook
+  `POST /api/avisos`.
+- `URL_PUBLICA`: origen absoluto usado en `sitemap.xml`. Por defecto, `https://albergue-el-cea.es`.
+- `ARCHIVO_RESERVAS`, `ARCHIVO_AVISOS` y `DIRECTORIO_SUBIDAS`: opcionales para cambiar las rutas de almacenamiento.
+
+Ninguna variable sensible empieza por `VITE_`: ese prefijo haría que Vite pudiera incluirla en el código enviado al navegador.
+
+## Lecciones y pruebas
+
+La solución ejecuta 98 tests en 10 archivos, todos en verde:
+
+| Lección | Trabajo principal                                                         | Tests |
+| ------- | ------------------------------------------------------------------------- | ----: |
+| Base    | Datos, fechas y validaciones ya presentes al empezar                      |     5 |
+| 14      | Configuración de rutas, documento raíz y 404                              |     5 |
+| 15      | Tipos de ruta, `href`, contexto tipado y errores                          |     5 |
+| 16      | Módulos `.server`, concurrencia, caché, `/mi-camino` y middleware cliente |     9 |
+| 17      | Prerender, caché HTTP y streaming                                         |     3 |
+| 18      | Sesiones, redirección provisional, middleware, flash y salida segura      |    26 |
+| 19      | CSV, JSON, sitemap, webhook, descarga y subida de credenciales            |    19 |
+| 20      | Destinos seguros, metadatos, origen de actions y CSP                      |    13 |
+| 21      | Pruebas de componentes, loaders, actions y middleware                     |     4 |
+| 22      | Docker, informe de errores, configuración e instrumentación               |     9 |
+
+`npm run leccion -- NN` permite ejecutar el archivo de una sola lección. Cada prueba vive en la
+lección donde el alumno escribe el código que comprueba; lo que ya existe al empezar está en
+`00-base.test.ts`.
+
+## Persistencia y despliegue
+
+Las reservas y avisos se guardan como JSON mediante escritura atómica. Las credenciales se guardan en `subidas/` con un UUID, nunca con el nombre aportado por el navegador. En Docker, `datos/` y `subidas/` pertenecen al usuario `node`; ambos directorios deben montarse en almacenamiento persistente si se quiere conservar su contenido entre despliegues.
+
+```bash
+docker build -t albergue-el-cea .
+docker run --rm -p 3000:3000 \
+  -e SECRETO_SESION -e AVISOS_TOKEN -e URL_PUBLICA \
+  -v "$(pwd)/datos:/app/datos" \
+  -v "$(pwd)/subidas:/app/subidas" \
+  albergue-el-cea
+```
+
+`SECRETO_SESION`, `AVISOS_TOKEN` y `URL_PUBLICA` se toman del entorno desde el que se ejecuta
+Docker. Los dos volúmenes conservan reservas, avisos y fotos entre contenedores.
+
+## CSP y páginas prerenderizadas
+
+El test de la lección 20 llama de verdad a `handleRequest` con peticiones `HEAD` para comprobar las
+cabeceras y que el nonce cambia. Además verifica en el módulo los dos puntos que reciben el nonce:
+`ServerRouter` y `renderToPipeableStream`. No se monta un `EntryContext` completo para renderizar el
+HTML porque resulta frágil y depende del manifiesto generado.
+
+Las páginas prerenderizadas son archivos estáticos al servirlas con `react-router-serve`: no pasan
+por `handleRequest`, no reciben su CSP y conservan el nonce generado durante el build. En producción,
+si esas páginas necesitan CSP, el proxy o CDN debe aplicarla con hashes; una política dinámica basada
+en nonce no puede renovarse para un HTML estático.

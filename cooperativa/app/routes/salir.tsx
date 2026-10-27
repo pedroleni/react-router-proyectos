@@ -1,13 +1,12 @@
 import { Form, href, Link, redirect } from 'react-router'
+import { cerrarSesion, leerSesion } from '~/sesiones.server'
 import type { Route } from './+types/salir'
 
 // Cerrar sesión cambia algo, así que va en una action (un POST), nunca en un
 // loader: un enlace o una imagen de otra web podrían cerrar tu sesión con un GET.
-export async function action(_: Route.ActionArgs) {
-  // TODO (paso 1): así no se cierra nada, la cookie sigue en el navegador.
-  // Lee la sesión y redirige con la cabecera Set-Cookie de cerrarSesion(sesion),
-  // que la borra.
-  return redirect(href('/'))
+export async function action({ request }: Route.ActionArgs) {
+  const sesion = await leerSesion(request)
+  return redirect(href('/'), { headers: { 'Set-Cookie': await cerrarSesion(sesion) } })
 }
 
 // Con componente, esta es una ruta de interfaz, y React Router comprueba el

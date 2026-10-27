@@ -13,10 +13,7 @@ export async function loader() {
 // (max-age, 5 minutos) y una caché compartida, como la de un CDN (s-maxage,
 // 1 hora). Nunca en una página que lleve datos de alguien.
 export function headers(_: Route.HeadersArgs) {
-  // TODO (paso 6): devuelve la cabecera Cache-Control para que el navegador
-  // guarde la página 5 minutos (max-age=300) y una caché compartida 1 hora
-  // (s-maxage=3600). public: no lleva datos de nadie.
-  return {}
+  return { 'Cache-Control': 'public, max-age=300, s-maxage=3600' }
 }
 
 export default function Catalogo({ loaderData }: Route.ComponentProps) {

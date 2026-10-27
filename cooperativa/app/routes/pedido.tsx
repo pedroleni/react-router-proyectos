@@ -1,10 +1,13 @@
-import { data, href, Link, useRouteLoaderData } from 'react-router'
+import { z } from 'zod'
+import { data, href, Link, redirect, useRouteLoaderData } from 'react-router'
 import { lineasDeCesta, totalDeCesta } from '~/cesta'
-import FormularioPedido, { type ResultadoPedido } from '~/componentes/FormularioPedido'
-import { socioContext } from '~/contexto.server'
-import { tokenPendiente } from '~/datos/pedidos.server'
+import FormularioPedido from '~/componentes/FormularioPedido'
+import { sesionContext, socioContext } from '~/contexto.server'
+import { productosDeLaSemana } from '~/datos/catalogo.server'
+import { guardarPedido, pedidoConToken, tokenPendiente } from '~/datos/pedidos.server'
 import { formatearEuros } from '~/dinero'
-import { PEDIDO_MINIMO } from '~/validacion/pedido'
+import { DIAS, PUNTOS } from '~/reparto'
+import { PEDIDO_MINIMO, PedidoFormulario } from '~/validacion/pedido'
 import type { Route } from './+types/pedido'
 import type { loader as loaderZona } from './zona'
 
@@ -24,8 +27,17 @@ export async function loader({ context }: Route.LoaderArgs) {
   return { token: await tokenPendiente(context.get(socioContext).id) }
 }
 
-export async function action({ request }: Route.ActionArgs) {
+export async function action({ request, context }: Route.ActionArgs) {
+  const socio = context.get(socioContext)
+  const sesion = context.get(sesionContext)
   const formulario = await request.formData()
+  const token = String(formulario.get('token') ?? '')
+
+  // Este formulario ya creó un pedido (otra pestaña, un doble clic, un
+  // formulario viejo): a tus pedidos, sin guardar otro y sin tocar la sesión.
+  // La cesta que haya ahora puede ser la de otra compra, y no es suya.
+  if (await pedidoConToken(socio.id, token)) return redirect(href('/socio/pedidos'))
+
   // Lo que se escribió, para volver a pintar el formulario si hay errores.
   const valores = {
     punto: String(formulario.get('punto') ?? ''),
@@ -33,29 +45,41 @@ export async function action({ request }: Route.ActionArgs) {
     telefono: String(formulario.get('telefono') ?? ''),
     comentario: String(formulario.get('comentario') ?? ''),
   }
+  const resultado = PedidoFormulario.safeParse(Object.fromEntries(formulario))
 
-  // TODO (paso 4):
-  // 0. El token (campo «token»): si ese formulario ya creó un pedido
-  //    (pedidoConToken(socio.id, token)), es otra pestaña, un doble clic o un
-  //    formulario viejo: redirige a /socio/pedidos sin validar nada más y sin
-  //    tocar la sesión. La cesta que haya ahora puede ser de otra compra.
-  // 1. Valida el formulario con PedidoFormulario.safeParse(Object.fromEntries(formulario)).
-  // 2. Lee la cesta de la sesión (sesionContext; si no hay, {}) y mira si se
-  //    puede pedir: problemaDeLaCesta(totalDeCesta(cesta, productosDeLaSemana())).
-  // 3. Si algo falla, devuelve con data() un 400 con { errores, valores }:
-  //    errores son los fieldErrors de z.flattenError(resultado.error) y, si la
-  //    cesta tiene un problema, además errores.cesta = [problema].
-  // 4. Si todo va bien: guardarPedido con el socio del context (socioContext),
-  //    los datos limpios de Zod, las líneas (lineasDeCesta) y el token. Si el
-  //    token no vale, devuelve null, y entonces un 400 con errores.cesta =
-  //    ['Este formulario ya no vale. Recarga la página y vuelve a confirmar.'].
-  //    Si no, devuelve { pedido, nuevo }: nuevo es false si otro envío con el
-  //    mismo token llegó a la vez y ya lo había creado. Solo si nuevo es true,
-  //    quita la cesta de la sesión (unset) y deja el aviso flash
-  //    `Pedido ${pedido.id} confirmado: recógelo el ${DIAS[pedido.dia]} en ${PUNTOS[pedido.punto]}.`
-  //    y devuelve un redirect a /socio/pedidos. La cookie la manda el middleware.
-  const errores: ResultadoPedido['errores'] = { cesta: ['Todavía no se pueden confirmar pedidos: falta el paso 4.'] }
-  return data({ errores, valores }, { status: 501 })
+  // La cesta no viaja en el formulario: está en la sesión, y es la que vale.
+  const productos = productosDeLaSemana()
+  const cesta = sesion.get('cesta') ?? {}
+  const problema = problemaDeLaCesta(totalDeCesta(cesta, productos))
+
+  if (!resultado.success || problema) {
+    const errores: Partial<Record<keyof typeof valores | 'cesta', string[]>> = resultado.success
+      ? {}
+      : z.flattenError(resultado.error).fieldErrors
+    if (problema) errores.cesta = [problema]
+    // 400: los datos no valen. Devuelto, no lanzado: el formulario sigue en
+    // pantalla con sus errores.
+    return data({ errores, valores }, { status: 400 })
+  }
+
+  // Con el token del formulario: si dos envíos con el mismo llegan a la vez,
+  // guardarPedido devuelve al segundo el pedido del primero; si el token no es
+  // el de la compra en curso, null.
+  const guardado = await guardarPedido({ socioId: socio.id, ...resultado.data, lineas: lineasDeCesta(cesta, productos), token })
+  if (!guardado) {
+    const errores = { cesta: ['Este formulario ya no vale. Recarga la página y vuelve a confirmar.'] }
+    return data({ errores, valores }, { status: 400 })
+  }
+
+  // Solo quien acaba de crear el pedido vacía la cesta y deja el aviso, que
+  // dura hasta que alguien lo lee. Un envío repetido que llegó a la vez, no.
+  const { pedido, nuevo } = guardado
+  if (nuevo) {
+    sesion.unset('cesta')
+    sesion.flash('aviso', `Pedido ${pedido.id} confirmado: recógelo el ${DIAS[pedido.dia]} en ${PUNTOS[pedido.punto]}.`)
+  }
+  // POST, redirección y GET: si recargas la página de destino, no se pide dos veces.
+  return redirect(href('/socio/pedidos'))
 }
 
 export default function PaginaPedido({ loaderData, actionData }: Route.ComponentProps) {

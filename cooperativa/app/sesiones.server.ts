@@ -1,4 +1,4 @@
-import { type Session, type SessionStorage } from 'react-router'
+import { createCookieSessionStorage, type Session, type SessionStorage } from 'react-router'
 import type { Cesta } from './tipos'
 import { secretosDeSesion } from './config.server'
 
@@ -17,15 +17,22 @@ export type Sesion = Session<DatosSesion, DatosFlash>
 
 /** El almacén de sesiones: la sesión entera viaja en una cookie firmada. */
 export function crearAlmacenDeSesiones(secretos: string[]): SessionStorage<DatosSesion, DatosFlash> {
-  // TODO (paso 1): devuelve createCookieSessionStorage<DatosSesion, DatosFlash>()
-  // con una cookie que se llame __sesion y que sea:
-  // - httpOnly (el JavaScript de la página no puede leerla),
-  // - sameSite 'lax' (no viaja en los POST que llegan desde otras webs),
-  // - secure solo en producción (process.env.NODE_ENV === 'production'),
-  // - de path '/', con dos semanas de vida (maxAge, en segundos),
-  // - firmada con los secretos que recibe esta función (secrets).
-  void secretos
-  throw new Error('Falta el almacén de sesiones (paso 1).')
+  return createCookieSessionStorage<DatosSesion, DatosFlash>({
+    cookie: {
+      name: '__sesion',
+      // El JavaScript de la página no puede leerla: un XSS no se la lleva.
+      httpOnly: true,
+      // No viaja en los POST que lleguen desde otras webs.
+      sameSite: 'lax',
+      // En producción, solo por HTTPS.
+      secure: process.env.NODE_ENV === 'production',
+      path: '/',
+      // Dos semanas.
+      maxAge: 60 * 60 * 24 * 14,
+      // Firmada: si alguien la cambia, la firma ya no cuadra y la sesión llega vacía.
+      secrets: secretos,
+    },
+  })
 }
 
 // El almacén se crea con la primera petición, no al importar el módulo: el

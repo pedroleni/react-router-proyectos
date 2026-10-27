@@ -1,20 +1,21 @@
 import { data, href, Link, useRouteLoaderData } from 'react-router'
+import { cestaDelFormulario } from '~/cesta'
 import ListaCesta from '~/componentes/ListaCesta'
+import { sesionContext } from '~/contexto.server'
+import { productosDeLaSemana } from '~/datos/catalogo.server'
 import type { Route } from './+types/cesta'
 import type { loader as loaderZona } from './zona'
 
 // Cada botón de la lista envía la cesta entera, con el cambio que pide. La
 // action la valida contra el catálogo y la deja en la sesión; el middleware
 // de la zona se encarga de mandar la cookie.
-export async function action(_: Route.ActionArgs) {
-  // TODO (paso 3): lee el formulario y saca la cesta que pide con
-  // cestaDelFormulario(formulario, productosDeLaSemana()).
-  // - Si es null, devuelve con data() un 400 con { ok: false as const, error:
-  //   'No hemos podido cambiar la cesta. Recarga la página y vuelve a probar.' }.
-  // - Si no, guárdala en la sesión del context (sesionContext) con
-  //   set('cesta', …) y devuelve { ok: true as const }. La cookie la manda el
-  //   middleware de la zona.
-  return data({ ok: false as const, error: 'Falta la action de la cesta (paso 3).' }, { status: 501 })
+export async function action({ request, context }: Route.ActionArgs) {
+  const cesta = cestaDelFormulario(await request.formData(), productosDeLaSemana())
+  if (!cesta) {
+    return data({ ok: false as const, error: 'No hemos podido cambiar la cesta. Recarga la página y vuelve a probar.' }, { status: 400 })
+  }
+  context.get(sesionContext).set('cesta', cesta)
+  return { ok: true as const }
 }
 
 export default function PaginaCesta() {

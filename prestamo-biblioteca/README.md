@@ -1,25 +1,22 @@
-# Préstamos de la biblioteca del IES Tierras Altas (punto de partida)
+# Préstamos de la biblioteca del IES Tierras Altas (solución)
 
 Este proyecto es parte de **[Tech Study Tracker](https://www.techstudytracker.com)**. Es el proyecto avanzado 25 de la ficha de React Router: *«Proyecto avanzado: migrar una app de `react-router-dom` 6 a React Router 8»*.
 
-La app con la que gestiona sus préstamos la biblioteca de un instituto de Soria: el catálogo con su búsqueda, la ficha de cada libro con sus ejemplares, y una zona para el personal (préstamos activos, devoluciones y préstamos nuevos). Está escrita como se escribía en 2024:
+La misma app que en la rama `main`, ya migrada:
 
-- `react-router-dom` 6.26.2 con `<BrowserRouter>` y `<Routes>`;
-- React 18.3.1;
-- datos pedidos con `useEffect`;
-- un componente `RutaProtegida` que envuelve las rutas del personal;
-- formularios con `onSubmit` y `fetch`.
+- React Router 8.5.0 en **modo datos**: `createBrowserRouter` y `RouterProvider`;
+- React 19.3.1 y Node.js 22.22 o superior (el `.nvmrc` pide la 24);
+- cada ruta, un módulo en `src/rutas/` con su `loader`, su `action` y su `ErrorBoundary`;
+- un middleware (`exigirSesion`, en `src/sesion.ts`) en lugar de `RutaProtegida`.
 
-Tu trabajo es llevarla a React Router 8.5.0, en modo datos, sin que se ponga en rojo ni uno solo de sus tests. Cada sitio que la lección te pide cambiar lleva un comentario `// TODO (paso N)`.
+Los 30 tests de caracterización, los 11 de `destinoSeguro` y los 5 de la cookie (`pruebas/servidor/`) son los mismos que al principio, sin tocar una línea, y siguen en verde. En `pruebas/nuevos/` hay uno más, para lo que la app hace ahora mejor que en la 6: si `/api/sesion` falla, lo dice y deja reintentar, en vez de tratarte como anónimo.
 
 ## Arrancar
-
-Necesitas Node.js 22.12 o superior. Desde el paso 2 necesitarás 22.22 o superior; el `.nvmrc` que añade la lección pide la 24.
 
 ```bash
 npm install
 npm run dev        # http://localhost:5173
-npm test           # 46 tests en verde: 30 de caracterización, 11 de destinoSeguro y 5 de la cookie
+npm test           # los 47 tests, en verde
 npm run typecheck  # TypeScript 7.0.2
 npm run build
 ```
@@ -28,13 +25,20 @@ Para entrar en la zona de préstamos: usuario `marta`, contraseña `tierrasaltas
 
 La cookie de sesión es `HttpOnly` y `SameSite=Lax`. Si la app se sirve por HTTPS (o con `COOKIE_SEGURA=1`), lleva además `Secure` y se llama `__Host-sesion`.
 
-## La API
+La API la sirve un plugin de Vite (`servidor/plugin.ts`) en `npm run dev` y en `npm run preview`, con los datos en memoria y 300 ms de latencia por respuesta (`LATENCIA_API=0 npm run dev` para quitarla).
 
-No hay un servidor aparte. `servidor/plugin.ts` es un plugin de Vite que sirve la API (`/api/libros`, `/api/prestamos`, `/api/sesion`…) en `npm run dev` y en `npm run preview`, con los datos en memoria: al reiniciar, vuelven a los de partida. Cada respuesta tarda 300 ms, como una red de verdad, para que se vean las peticiones en cascada. Lo cambias con `LATENCIA_API=0 npm run dev`.
+## Dónde está cada cosa
 
-## Las dos carpetas que no se tocan
+```text
+src/
+├── app.tsx            iniciarApp: crea el router y lo monta (main.tsx y los tests)
+├── rutas.tsx          el árbol de rutas, como objetos
+├── rutas/             un módulo por ruta: loader, action, Component, ErrorBoundary
+├── sesion.ts          la sesión compartida (getContext) y el middleware exigirSesion
+├── api.ts             pedirJson y enviarJson
+└── componentes/Campo.tsx
+servidor/              la API en memoria y su plugin de Vite
+pruebas/               los tests de caracterización
+```
 
-- `pruebas/`: los tests de caracterización. Montan la app con `iniciarApp` (de `src/app.tsx`), igual que `main.tsx`, miran la URL y lo que se ve, y hablan con la misma API en memoria. No saben qué router usa la app ni cómo pide sus datos, y por eso valen igual al principio y al final.
-- `servidor/`: la API. `pruebas/servidor/` comprueba su cookie de sesión con un servidor HTTP de Node de verdad.
-
-Si un paso te obliga a cambiar un test de caracterización o algo de `servidor/`, el paso está mal. Lo que sí harás, en el paso 3.2, es añadir un test nuevo en `pruebas/nuevos/` para lo que la app pasa a hacer mejor que en la 6.
+El paso 4 de la lección, opcional, lleva esta misma app al modo framework en SPA Mode. No está en esta rama: la lección lo cuenta paso a paso.

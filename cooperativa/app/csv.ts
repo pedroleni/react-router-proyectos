@@ -7,17 +7,17 @@ const SEPARADOR = ';'
 
 /** Una celda, lista para ir entre punto y coma. */
 export function celdaCsv(valor: string | number): string {
-  // TODO (paso 5):
-  // - Inyección de fórmulas: si empieza por = + - @, un tabulador o \r, ponle
-  //   un apóstrofo delante. Así la hoja de cálculo lo trata como texto.
-  // - Si lleva el separador, comillas o un salto de línea, enciérrala entre
-  //   comillas y escribe dos veces las comillas de dentro.
-  return String(valor)
+  let texto = String(valor)
+  // Inyección de fórmulas: una hoja de cálculo ejecuta como fórmula cualquier
+  // celda que empiece por = + - o @. Con un apóstrofo delante, es texto.
+  if (/^[=+\-@\t\r]/.test(texto)) texto = `'${texto}`
+  // Si lleva el separador, comillas o un salto de línea, va entre comillas, y
+  // las comillas de dentro se escriben dos veces.
+  if (/[;"\r\n]/.test(texto)) texto = `"${texto.replaceAll('"', '""')}"`
+  return texto
 }
 
 /** Un CSV entero: la primera fila es la de los títulos. */
 export function aCsv(filas: (string | number)[][]): string {
-  // TODO (paso 5): empieza con la marca BOM ('\uFEFF'), pasa cada valor por
-  // celdaCsv y termina cada fila (también la última) con \r\n.
-  return filas.map((fila) => fila.join(SEPARADOR)).join('\n')
+  return '\uFEFF' + filas.map((fila) => fila.map(celdaCsv).join(SEPARADOR)).join('\r\n') + '\r\n'
 }

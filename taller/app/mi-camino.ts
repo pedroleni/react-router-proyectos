@@ -1,9 +1,21 @@
+import { z } from 'zod/mini'
+import { ETAPAS } from '~/datos/etapas'
+
+const CLAVE_MI_CAMINO = 'el-cea:mi-camino'
+// L16: zod/mini conserva esta validación sin enviar Zod completo al navegador.
+const ListaDeSlugs = z.array(z.string())
+const slugsConocidos = new Set(ETAPAS.map((etapa) => etapa.slug))
+
 export function leerMiCamino(): string[] {
-  // TODO (lección 16): lee y valida los slugs guardados en localStorage.
-  throw new Error('TODO (lección 16): leer Mi camino del navegador.')
+  try {
+    const resultado = ListaDeSlugs.safeParse(JSON.parse(localStorage.getItem(CLAVE_MI_CAMINO) ?? '[]'))
+    return resultado.success ? [...new Set(resultado.data.filter((slug) => slugsConocidos.has(slug)))] : []
+  } catch {
+    return []
+  }
 }
 
-export function anadirAMiCamino(_slug: string): void {
-  // TODO (lección 16): añade sin duplicar una etapa conocida a localStorage.
-  throw new Error('TODO (lección 16): guardar una etapa en Mi camino.')
+export function anadirAMiCamino(slug: string): void {
+  if (!slugsConocidos.has(slug)) return
+  localStorage.setItem(CLAVE_MI_CAMINO, JSON.stringify([...new Set([...leerMiCamino(), slug])]))
 }
