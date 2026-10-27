@@ -1,0 +1,398 @@
+/* La Huerta del Ebro: verde de huerta, tierra y papel de estraza. */
+:root {
+  --verde: #2f5d3a;
+  --verde-claro: #e3ecdf;
+  --tierra: #9a4a24;
+  --papel: #f7f3ea;
+  --tinta: #1f2a22;
+  --gris: #5b6158;
+  --borde: #d6d0c2;
+  --error: #a42a1d;
+  color-scheme: light;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--papel);
+  color: var(--tinta);
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  font-size: 1.0625rem;
+  line-height: 1.55;
+}
+
+a {
+  color: var(--verde);
+}
+
+h1,
+h2 {
+  line-height: 1.2;
+  font-family: Georgia, 'Iowan Old Style', serif;
+}
+
+/* Cabecera y pie */
+.cabecera {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem 2rem;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem clamp(1rem, 4vw, 3rem);
+  background: var(--verde);
+  color: white;
+}
+
+.marca {
+  display: grid;
+  color: white;
+  text-decoration: none;
+}
+
+.marca-nombre {
+  font: 700 1.5rem Georgia, serif;
+}
+
+.marca-lema {
+  font-size: 0.85rem;
+  opacity: 0.85;
+}
+
+.menu {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.25rem;
+}
+
+.menu a {
+  color: white;
+  text-decoration: none;
+  padding: 0.25rem 0;
+  border-bottom: 2px solid transparent;
+}
+
+.menu a.active,
+.menu a:hover {
+  border-bottom-color: white;
+}
+
+.menu .menu-socios {
+  padding: 0.25rem 0.75rem;
+  border: 2px solid white;
+  border-radius: 999px;
+}
+
+.pie {
+  margin-top: 4rem;
+  padding: 1.5rem clamp(1rem, 4vw, 3rem);
+  border-top: 1px solid var(--borde);
+  color: var(--gris);
+  font-size: 0.9rem;
+}
+
+/* Páginas */
+.pagina {
+  max-width: 64rem;
+  margin: 0 auto;
+  padding: 2rem clamp(1rem, 4vw, 3rem);
+}
+
+.pagina.estrecha {
+  max-width: 44rem;
+}
+
+.antetitulo {
+  margin: 0;
+  color: var(--tierra);
+  font-weight: 700;
+  font-size: 0.85rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.portada h1 {
+  max-width: 20ch;
+  margin: 0.5rem 0 1rem;
+  font-size: clamp(2rem, 5vw, 3.25rem);
+}
+
+.entradilla {
+  max-width: 60ch;
+  color: var(--gris);
+  font-size: 1.15rem;
+}
+
+.acciones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+}
+
+.boton,
+button {
+  display: inline-block;
+  padding: 0.6rem 1.1rem;
+  border: 2px solid var(--verde);
+  border-radius: 8px;
+  background: var(--verde);
+  color: white;
+  font: inherit;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.boton.secundario {
+  background: transparent;
+  color: var(--verde);
+}
+
+button:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+button.enlace {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--verde);
+  text-decoration: underline;
+}
+
+.pasos ol {
+  padding-left: 1.25rem;
+}
+
+/* Catálogo */
+.catalogo {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(13rem, 1fr));
+  gap: 1rem;
+  padding: 0;
+  list-style: none;
+}
+
+.tarjeta-producto {
+  padding: 1rem;
+  border: 1px solid var(--borde);
+  border-radius: 12px;
+  background: white;
+}
+
+.tarjeta-producto h2 {
+  margin: 0 0 0.25rem;
+  font-size: 1.2rem;
+}
+
+.tarjeta-producto p {
+  margin: 0;
+  color: var(--gris);
+}
+
+.tarjeta-producto .precio {
+  margin-top: 0.5rem;
+  color: var(--tierra);
+  font-weight: 700;
+  font-size: 1.15rem;
+}
+
+/* Formularios */
+.formulario {
+  display: grid;
+  gap: 1.1rem;
+  margin-top: 1.5rem;
+}
+
+.campo {
+  display: grid;
+  gap: 0.3rem;
+}
+
+.campo input,
+.campo textarea {
+  padding: 0.55rem 0.7rem;
+  border: 1px solid var(--borde);
+  border-radius: 6px;
+  background: white;
+  font: inherit;
+}
+
+[aria-invalid='true'] {
+  border-color: var(--error);
+  outline-color: var(--error);
+}
+
+fieldset {
+  display: grid;
+  gap: 0.35rem;
+  margin: 0;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--borde);
+  border-radius: 8px;
+}
+
+legend {
+  padding: 0 0.25rem;
+  font-weight: 600;
+}
+
+.error {
+  margin: 0;
+  color: var(--error);
+  font-weight: 600;
+}
+
+/* Zona de socios */
+.zona-barra {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 2rem;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem clamp(1rem, 4vw, 3rem);
+  background: var(--verde-claro);
+}
+
+.zona-barra p {
+  margin: 0;
+}
+
+.numero {
+  color: var(--gris);
+}
+
+.resumen-cesta {
+  font-weight: 600;
+}
+
+.zona-menu {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.5rem;
+  padding: 0.75rem clamp(1rem, 4vw, 3rem);
+  border-bottom: 1px solid var(--borde);
+}
+
+.zona-menu a {
+  text-decoration: none;
+}
+
+.zona-menu a.active {
+  font-weight: 700;
+  text-decoration: underline;
+}
+
+.lista-cesta ul {
+  display: grid;
+  gap: 0.5rem;
+  padding: 0;
+  list-style: none;
+}
+
+.fila-producto {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.6rem 1rem;
+  border: 1px solid var(--borde);
+  border-radius: 10px;
+  background: white;
+}
+
+.fila-producto.en-la-cesta {
+  border-color: var(--verde);
+  box-shadow: inset 4px 0 0 var(--verde);
+}
+
+.fila-producto h2 {
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.fila-producto p {
+  margin: 0;
+  color: var(--gris);
+}
+
+.fila-botones {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.fila-botones button {
+  width: 2.5rem;
+  height: 2.5rem;
+  padding: 0;
+  font-size: 1.3rem;
+  line-height: 1;
+}
+
+.cantidad {
+  min-width: 2ch;
+  font-size: 1.25rem;
+  font-weight: 700;
+  text-align: center;
+}
+
+.cesta-pie {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.total {
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.tabla-cesta {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.tabla-cesta caption {
+  text-align: left;
+  font-weight: 600;
+  padding-bottom: 0.5rem;
+}
+
+.tabla-cesta th,
+.tabla-cesta td {
+  padding: 0.4rem 0.5rem;
+  border-bottom: 1px solid var(--borde);
+  text-align: left;
+}
+
+.tabla-cesta .formato {
+  color: var(--gris);
+}
+
+.aviso {
+  padding: 0.75rem 1rem;
+  border-left: 4px solid var(--verde);
+  background: var(--verde-claro);
+  font-weight: 600;
+}
+
+.aviso.vacio {
+  display: none;
+}
+
+.lista-pedidos {
+  padding-left: 1.25rem;
+}
+
+.pila {
+  overflow: auto;
+  padding: 1rem;
+  background: white;
+  font-size: 0.8rem;
+}

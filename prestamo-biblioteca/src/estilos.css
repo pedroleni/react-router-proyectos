@@ -1,0 +1,413 @@
+:root {
+  --tinta: #1d2a30;
+  --tinta-suave: #4f5d63;
+  --papel: #f7f3ea;
+  --tarjeta: #fffdf8;
+  --linea: #ddd3bf;
+  --azul: #1f4e5f;
+  --azul-claro: #e3eef1;
+  --verde: #2f6b45;
+  --rojo: #a4402a;
+  --rojo-claro: #f8e4dc;
+  --radio: 10px;
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  color: var(--tinta);
+  background: var(--papel);
+  line-height: 1.5;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+}
+
+h1,
+h2 {
+  font-family: Georgia, 'Iowan Old Style', 'Times New Roman', serif;
+  line-height: 1.2;
+}
+
+h1 {
+  font-size: 2rem;
+  margin: 0 0 1rem;
+}
+
+a {
+  color: var(--azul);
+}
+
+button,
+.boton {
+  font: inherit;
+  border: 0;
+  border-radius: 999px;
+  padding: 0.5rem 1.1rem;
+  background: var(--azul);
+  color: white;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-block;
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: progress;
+}
+
+.boton-secundario {
+  background: transparent;
+  color: var(--azul);
+  border: 1px solid var(--azul);
+}
+
+input,
+select {
+  font: inherit;
+  padding: 0.5rem 0.7rem;
+  border: 1px solid var(--linea);
+  border-radius: 8px;
+  background: white;
+  min-width: 0;
+}
+
+:focus-visible {
+  outline: 3px solid #e0a43a;
+  outline-offset: 2px;
+}
+
+.visualmente-oculto {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* Marco */
+
+.marco {
+  min-height: 100vh;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+}
+
+.cabecera {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  padding: 1rem 2.5rem;
+  background: var(--azul);
+  color: white;
+}
+
+.cabecera a {
+  color: white;
+}
+
+.marca {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-family: Georgia, serif;
+  font-size: 1.25rem;
+  text-decoration: none;
+}
+
+.marca-sello {
+  display: grid;
+  place-items: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 8px;
+  background: var(--papel);
+  color: var(--azul);
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+}
+
+.menu {
+  display: flex;
+  gap: 1.25rem;
+}
+
+.menu a {
+  text-decoration: none;
+  padding-bottom: 0.2rem;
+  border-bottom: 2px solid transparent;
+}
+
+.menu a.active {
+  border-bottom-color: #e0a43a;
+}
+
+.sesion {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.sesion .boton-secundario {
+  color: white;
+  border-color: rgb(255 255 255 / 0.7);
+}
+
+.contenido {
+  width: min(960px, 100% - 3rem);
+  margin: 2.5rem auto;
+}
+
+.pie {
+  padding: 1.25rem 2.5rem;
+  color: var(--tinta-suave);
+  border-top: 1px solid var(--linea);
+  font-size: 0.9rem;
+}
+
+/* Estados */
+
+.cargando {
+  color: var(--tinta-suave);
+  font-style: italic;
+}
+
+.aviso-error {
+  padding: 0.75rem 1rem;
+  border-radius: var(--radio);
+  background: var(--rojo-claro);
+  color: var(--rojo);
+  font-weight: 600;
+}
+
+/* Catálogo */
+
+.busqueda {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.busqueda input {
+  flex: 1;
+  max-width: 22rem;
+}
+
+.libros {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 1rem;
+}
+
+.libro {
+  display: grid;
+  gap: 0.25rem;
+  padding: 1rem 1.25rem;
+  background: var(--tarjeta);
+  border: 1px solid var(--linea);
+  border-radius: var(--radio);
+}
+
+.libro-titulo {
+  font-family: Georgia, serif;
+  font-size: 1.15rem;
+  font-weight: 700;
+}
+
+.libro-autor {
+  color: var(--tinta-suave);
+}
+
+.disponibles {
+  color: var(--verde);
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.disponibles.agotado {
+  color: var(--rojo);
+}
+
+/* Ficha */
+
+.migas {
+  margin: 0 0 0.5rem;
+}
+
+.ficha-autor {
+  font-size: 1.2rem;
+  color: var(--tinta-suave);
+  margin-top: -0.5rem;
+}
+
+.ficha-datos {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 0.25rem 1.5rem;
+}
+
+.ficha-datos dt {
+  font-weight: 600;
+}
+
+.ficha-datos dd {
+  margin: 0;
+}
+
+.ejemplares {
+  list-style: none;
+  padding: 0;
+  display: grid;
+  gap: 0.5rem;
+}
+
+.ejemplares li {
+  display: flex;
+  gap: 1rem;
+  padding: 0.6rem 1rem;
+  border-radius: 8px;
+  background: var(--tarjeta);
+  border: 1px solid var(--linea);
+}
+
+.ejemplares .prestado {
+  color: var(--tinta-suave);
+}
+
+.ejemplares .codigo {
+  font-family: ui-monospace, Menlo, monospace;
+  font-weight: 600;
+  min-width: 4.5rem;
+}
+
+/* Préstamos */
+
+.titulo-con-accion {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.resumen {
+  color: var(--tinta-suave);
+  margin-top: -0.5rem;
+}
+
+.prestamos {
+  list-style: none;
+  padding: 0;
+  display: grid;
+  gap: 0.5rem;
+}
+
+.prestamo {
+  display: grid;
+  grid-template-columns: 1.4fr 1.4fr 1.6fr 6rem auto;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.75rem 1rem;
+  background: var(--tarjeta);
+  border: 1px solid var(--linea);
+  border-radius: var(--radio);
+}
+
+/* La etiqueta y el botón, siempre en su columna, haya etiqueta o no. */
+.prestamo .etiqueta {
+  grid-column: 4;
+  justify-self: start;
+}
+
+.prestamo > :last-child {
+  grid-column: 5;
+}
+
+.prestamo.vencido {
+  border-color: var(--rojo);
+  background: #fff8f4;
+}
+
+.prestamo-titulo {
+  font-weight: 700;
+}
+
+.prestamo-fecha {
+  color: var(--tinta-suave);
+  font-size: 0.95rem;
+}
+
+.etiqueta {
+  padding: 0.15rem 0.6rem;
+  border-radius: 999px;
+  background: var(--rojo-claro);
+  color: var(--rojo);
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.prestamo form {
+  margin: 0;
+}
+
+/* Formularios */
+
+.estrecha {
+  max-width: 34rem;
+}
+
+.formulario {
+  display: grid;
+  gap: 1rem;
+  padding: 1.5rem;
+  background: var(--tarjeta);
+  border: 1px solid var(--linea);
+  border-radius: var(--radio);
+}
+
+.formulario button[type='submit'] {
+  justify-self: start;
+}
+
+.campo {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.campo label {
+  font-weight: 600;
+}
+
+.error-campo {
+  margin: 0;
+  color: var(--rojo);
+  font-size: 0.95rem;
+}
+
+[aria-invalid='true'] {
+  border-color: var(--rojo);
+}
+
+@media (max-width: 720px) {
+  .cabecera {
+    flex-wrap: wrap;
+    gap: 1rem;
+    padding: 1rem 1.25rem;
+  }
+
+  .prestamo {
+    grid-template-columns: 1fr;
+  }
+
+  .prestamo > *,
+  .prestamo .etiqueta {
+    grid-column: auto;
+  }
+}
